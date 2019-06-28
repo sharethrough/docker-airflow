@@ -1,26 +1,24 @@
-### Vim ###
-[._]*.s[a-w][a-z]
-[._]s[a-w][a-z]
-*.un~
-Session.vim
-.netrwhist
 *~
+*#
+.#*
+\#*#
+.*.sw[a-z]
+*.un~
 
-### SublimeText ###
-# cache files for sublime text
-*.tmlanguage.cache
-*.tmPreferences.cache
-*.stTheme.cache
+# Bundler
+Gemfile.lock
+.bundle/*
 
-# workspace files are user-specific
-*.sublime-workspace
+.terraform
 
-# project files should be checked into the repository, unless a significant
-# proportion of contributors will probably not be using SublimeText
-# *.sublime-project
+.idea/
 
-# sftp configuration file
-sftp-config.json
+*.pyc
 
-# Python
-__pycache__
+.pt
+
+.env
+env/
+.env-bkup
+
+.tool-versions
