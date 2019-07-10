@@ -2,34 +2,6 @@
 
 TRY_LOOP="20"
 
-: "${REDIS_HOST:="redis"}"
-: "${REDIS_PORT:="6379"}"
-: "${REDIS_PASSWORD:=""}"
-
-: "${MYSQL_HOST:="airflow-upgrade-test.cklgyiqeuva6.us-west-2.rds.amazonaws.com"}"
-: "${MYSQL_PORT:="3306"}"
-: "${MYSQL_USER:="root"}"
-: "${MYSQL_PASSWORD:="Dat3.c.j"}"
-: "${MYSQL_DB:="airflow_metadata"}"
-
-# Defaults and back-compat
-: "${AIRFLOW__CORE__FERNET_KEY:=${FERNET_KEY:=$(python -c "from cryptography.fernet import Fernet; FERNET_KEY = Fernet.generate_key().decode(); print(FERNET_KEY)")}}"
-: "${AIRFLOW__CORE__EXECUTOR:=${EXECUTOR:-Sequential}Executor}"
-
-export \
-  AIRFLOW__CELERY__BROKER_URL \
-  AIRFLOW__CELERY__RESULT_BACKEND \
-  AIRFLOW__CORE__EXECUTOR \
-  AIRFLOW__CORE__FERNET_KEY \
-  AIRFLOW__CORE__LOAD_EXAMPLES \
-  AIRFLOW__CORE__SQL_ALCHEMY_CONN \
-
-if [ -n "$REDIS_PASSWORD" ]; then
-    REDIS_PREFIX=:${REDIS_PASSWORD}@
-else
-    REDIS_PREFIX=
-fi
-
 wait_for_port() {
   local name="$1" host="$2" port="$3"
   local j=0
@@ -44,28 +16,36 @@ wait_for_port() {
   done
 }
 
-if [ "$AIRFLOW__CORE__EXECUTOR" != "SequentialExecutor" ]; then
-  AIRFLOW__CORE__SQL_ALCHEMY_CONN="mysql://$MYSQL_USER:$MYSQL_PASSWORD@$MYSQL_HOST:$MYSQL_PORT/$MYSQL_DB"
-  AIRFLOW__CELERY__RESULT_BACKEND="db+mysql://$MYSQL_USER:$MYSQL_PASSWORD@$MYSQL_HOST:$MYSQL_PORT/$MYSQL_DB"
-  wait_for_port "Mysql" "$MYSQL_HOST" "$MYSQL_PORT"
-fi
+wait_for_port "Mysql" "$MYSQL_HOST" "$MYSQL_PORT"
 
-if [ "$AIRFLOW__CORE__EXECUTOR" = "CeleryExecutor" ]; then
-  AIRFLOW__CELERY__BROKER_URL="redis://$REDIS_PREFIX$REDIS_HOST:$REDIS_PORT/1"
-  wait_for_port "Redis" "$REDIS_HOST" "$REDIS_PORT"
-fi
+wait_for_port "Redis" "$REDIS_HOST" "$REDIS_PORT"
+
+handle_worker_term_signal() {
+  celery -b $broker_url -d $celery_worker control cancel_consumer $queue_name
+
+  while (( $(celery -b $broker_url inspect active --json | python -c "import sys, json; print len(json.load(sys.stdin)['$celery_worker'])") > 0 )); do
+    sleep 300
+    done
+
+    kill $pid
+    exit 0
+}
 
 case "$1" in
   webserver)
     airflow initdb
-    if [ "$AIRFLOW__CORE__EXECUTOR" = "LocalExecutor" ]; then
-      # With the "Local" executor it should all run in one container.
-      airflow scheduler &
-    fi
-    exec airflow webserver
+    exec airflow "$@"
     ;;
-  worker|scheduler)
+  worker)
     # To give the webserver time to run initdb.
+    sleep 10
+    trap handle_worker_term_signal SIGTERM
+
+    exec airflow worker & pid="$!"
+
+    wait $pid
+    ;;
+  scheduler)
     sleep 10
     exec airflow "$@"
     ;;
