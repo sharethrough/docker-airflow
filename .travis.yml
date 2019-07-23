@@ -2,15 +2,13 @@ sudo: required
 
 language: minimal
 
-install:
-        - echo "Pre testing"
-
-script:
-        - echo "Testing scripts"
+branches:
+  only:
+  - master
 
 after_success:
         - docker --version
-        - pip3 install --user awscli
+        - pip install --user awscli
         - export PATH=$PATH:$HOME/.local/bin
         - eval $(aws ecr get-login --no-include-email --region us-east-1)
         - docker build -t 119933218031.dkr.ecr.us-east-1.amazonaws.com/airflow-base .
