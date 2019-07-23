@@ -6,10 +6,10 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV TERM linux
 
 # Airflow
-ARG AIRFLOW_VERSION=1.8.2
+ARG AIRFLOW_VERSION=1.10.3
 ARG AIRFLOW_USER_HOME=/usr/local/airflow
-ARG AIRFLOW_DEPS="crypto,celery,jdbc,mysql,ssh"
-ARG PYTHON_DEPS=""
+ARG AIRFLOW_DEPS="crypto,celery,jdbc,mysql,ssh,slack"
+ARG PYTHON_DEPS="slackclient>=1.0.0,<2.0.0 Flask==1.0.4"
 ENV AIRFLOW_HOME=${AIRFLOW_USER_HOME}
 
 # Define en_US.
@@ -48,6 +48,7 @@ RUN set -ex \
         netcat \
         locales \
         vim \
+        jq \
     && sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
     && locale-gen \
     && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
@@ -74,12 +75,13 @@ COPY script/entrypoint.sh /entrypoint.sh
 COPY config/airflow.cfg ${AIRFLOW_USER_HOME}/airflow.cfg
 
 ONBUILD COPY requirements.txt .
-ONBUILD COPY dags/ .
-ONBUILD COPY plugins/ .
+ONBUILD COPY dags $AIRFLOW_HOME/dags
+ONBUILD COPY plugins $AIRFLOW_HOME/plugins
 
 ONBUILD RUN pip install --no-cache-dir -r requirements.txt
 
 RUN chown -R ${USER}:${GROUP} ${AIRFLOW_USER_HOME}
+RUN chown -R ${USER}:${GROUP} /home
 
 EXPOSE 8080 5555 8793
 
