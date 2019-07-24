@@ -4,7 +4,7 @@ REPO=airflow-base
 TARGET_IMAGE="119933218031.dkr.ecr.us-east-1.amazonaws.com/${REPO}"
 TARGET_IMAGE_LATEST="${TARGET_IMAGE}:latest"
 
-cat ~/.aws/credentials
+aws configure set default.region us-east-1
 
 echo "Authenticating with ecr"
 eval $(aws ecr get-login --no-include-email --region us-east-1)
