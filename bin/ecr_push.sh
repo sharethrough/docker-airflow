@@ -5,6 +5,8 @@ TARGET_IMAGE="119933218031.dkr.ecr.us-east-1.amazonaws.com/${REPO}"
 TARGET_IMAGE_LATEST="${TARGET_IMAGE}:latest"
 
 
+echo "AWS Creds: ${AWS_ACCESS_KEY_ID} ${AWS_SECRET_ACCESS_KEY}"
+
 echo "Authenticating with ecr"
 eval $(aws ecr get-login --no-include-email --region us-east-1)
 
