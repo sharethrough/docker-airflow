@@ -1,13 +1,13 @@
 sudo: required
 language: python
 services:
-- docker
+  - docker
 before_install:
-- pip install awscli
-- export PATH=$PATH:$HOME/.local/bin
-- bash bin/aws_credentials.sh
+  - docker --version
+  - pip install awscli
+  - export PATH=$PATH:$HOME/.local/bin
 script:
-- docker build -t 119933218031.dkr.ecr.us-east-1.amazonaws.com/airflow-base .
+  - docker build -t 119933218031.dkr.ecr.us-east-1.amazonaws.com/airflow-base .
 deploy:
   provider: script
   script: bash bin/ecr_push.sh
