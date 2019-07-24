@@ -10,6 +10,7 @@ env:
 before_install:
 - pip install --user awscli
 - export PATH=$PATH:$HOME/.local/bin
+- ./bin/aws_credentials.sh
 script:
 - docker build -t 119933218031.dkr.ecr.us-east-1.amazonaws.com/airflow-base .
 deploy:
