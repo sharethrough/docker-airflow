@@ -18,5 +18,4 @@ eval $(aws ecr get-login --no-include-email --region us-east-1)
 
 echo "Pushing built image to ecr"
 
-docker tag ${REPO} ${TARGET_IMAGE_LATEST}
 docker push ${TARGET_IMAGE_LATEST}
