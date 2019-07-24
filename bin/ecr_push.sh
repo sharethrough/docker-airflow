@@ -9,7 +9,7 @@ VERSION="${TIMESTAMP}-${TRAVIS_COMMIT}"
 TARGET_IMAGE_VERSIONED="${TARGET_IMAGE}:${VERSION}"
 
 echo "Authenticating with ecr"
-eval $(aws ecr get-login --no-include-email)
+eval $(aws ecr get-login --no-include-email --region us-east-1)
 
 echo "Pushing built image to ecr"
 
