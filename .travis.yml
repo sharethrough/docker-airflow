@@ -1,15 +1,22 @@
 sudo: required
-
 language: minimal
-
-branches:
-  only:
-  - master
-
-after_success:
-        - docker --version
-        - pip install --user awscli
-        - export PATH=$PATH:$HOME/.local/bin
-        - eval $(aws ecr get-login --no-include-email --region us-east-1)
-        - docker build -t 119933218031.dkr.ecr.us-east-1.amazonaws.com/airflow-base .
-        - docker push 119933218031.dkr.ecr.us-east-1.amazonaws.com/airflow-base
+services:
+- docker
+env:
+  global:
+  - secure: travisEncryptedAWS_REGION
+  - secure: travisEncryptedAWS_ACCESS_KEY_ID
+  - secure: travisEncryptedAWS_SECRET_ACCESS_KEY
+    before_install:
+    - pip install awscli
+    - export PATH=$PATH:$HOME/.local/bin
+  - secure: mIpzBXgsVZ75VXPsIykSmIF/grsVpjUTWO0qS6Eu62FjFOxCtR3x/txomPNBLLN1RaNEjkgpbpp/9zN7S6g5e6BAz1/OHwnJJt8DHk32TogYE+Un/HSU3Kf+/YTWqmYENGDJdweydTHlbUa3zqmxkoWWbB+j9obAKsOF5ON4sGKIt9gK6t+2VZa7mevRsYwHmi0y4Lgs5SKjwNAq1gaDmlXbive9ztaryK7TjDK/pujq/I25en6Z4ReP9zzdaDgpTYjQ3wZBlZLIyXmyQWz+ZMdVMcCc/DEAu29gkG357kXE5MAFhn295wUBZWtl3ILUzlYDd5YphaFMJtNbd7NRIxUtd3RR2eDI/wQuibvcRC2UzWH9RduALmDGJD62PQ6OM+LaPMzpEYxTw3MvUu+vT7urcwbD49NynbAZLUVG14ir+AKdN9oTLHvMFs87/61Oln7/XBmxWm4XNtVKowmBAnYnSjDEKhP95eFm9Kah+7QcxJBH3A1uafo8lzOVUu8A1UNrly950s38AjmmLqK+4PvTm1ZODA+MtiqYeI8Cyo/XBNQAR1Y9CxUI9IT8NxyjnrKtVp791lSibYt2bhwn8ti07e5z3qT7C8Y47EjpX1nHftVDMlT6X44lRalVvEpcXApGD0juxPIJW/lid13U6slbZ1X0sCp3BtAeKUKqqDo=
+  - secure: ADIlKmPv4ZQPzqPBM4ZO0a9UzA6aDtylYjxpJHD3XNwOW+QFs7R0FsxBo81XOvPm6MAzH8DtaAnCsdu013O7t9J/QRoGEqY00OBKm1d68OzP6L5tvWRjPd+xpeJ4ih4A8jm/lkZSO/gA8lgWkFP7B3KxOVLfvuE7nUmZVwd1RD32PGkNn9CuwJNljU9OKWKUVwGczdQIN4RVYHt0kafTFNk8MCiiSwHhkS+NA6eiNGonscfY+TDeGHT9aW4MbXTu0yHMn+6UHsdxRl9myrOWJtwRUMkJPhk8cvoIOyosUECE/vLWEDOKXAhGl3pSzCU+srq8ESf/7HZuPtAWW8IIcIRcj/HNixJ1eeJzYxLr5IEL2QIgMLE1Lgd+1+hdESPxnmJlfUsrx88CHwtQwP8EGbGpjugIf8g6N9Buhr2QeGweM90ucv0Sy/ZWJJZZj3Rz9hVbF/nuAyBDgfwL3kyY6W6qQb9dqImH/O+j6b8pw5VSMhpBD0L0FUecamvC/I1zsbHPAiHHOAEDMfqxMqSpAUVUjKigeEVEfTQ5EQlUD/uWdur1weitWAp9rpQUNs1fwPSDnADNFbJoSh3AKVHVHcCGI713d7ZkzvKSJgBXNfsUVLrwJ0fN448yZAtVfRt4rodkLscSribryuRLc3OFNgSgobUX68PoFtVsdWfT7m0=
+  - secure: MNGwBVpnx3m6JZ0rr5RWhX7D9ocXDChJzWVXCykXUNfFp2wWUiBltchmIxe58LNtno+egvWrhgFf3ChOPMIGQ1njisKg9kx+XjvRWcuL/Wro33JHjzhIvtYuWSIdcopyfzvyokIzoYqqLqkPqJbaKnheFh+QYC8u8NITs6nZMgA9i+g7EdLMgfvCiMkEnRr8pz/QuQfkVPYf44IVnxWrIwBnzwd5DU7592FzBzSzoFpZmU/u12PvHyjGxZykj9tkYbq+qci7MK4NWkV40uumKxGGQZNY+5hk3pOIlIZ5h+IomCWDt/U9ic+o3nmHpuAeyocAF6ahTit7hOlDqZTAoMpBEVcQWDlDMqyT9sq0xjBRnFhaqvATyNXKoTWcNrnmSASaBdet7MdblIxvr9te8NZHXl/Aj5Vmfbt6a/B7QkR0cpFiT72BFsYuRUsoWCTOXl0jNUASk1O6ZbaKoF8JtVX0fWfk5/YEzA6cSKY63wppmWmQdUe8J9Cl4XjXXRKs7MdHkdWvPJAV7K7CLBFWuqC2MTutFY6oPiMey7l23EWKsfZAsSgIp1+auQ0dy7LlubDxxOFGCjXm5w032v+V/I27gNUW7qOE0atsOCqQ2NYj9wNyWVxrjnHlCe4Va+zdFLL+D/djmdjE60M7Ce9SuzalYHdnSoKPfXOArjFrFCc=
+script:
+- docker build -t 119933218031.dkr.ecr.us-east-1.amazonaws.com/airflow-base .
+deploy:
+  provider: script
+  script: bash bin/ecr_push.sh
+  on:
+    branch: master
