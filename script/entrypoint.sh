@@ -35,9 +35,14 @@ wait_for_port() {
   done
 }
 
-wait_for_port "Mysql" "$MYSQL_HOST" "$MYSQL_PORT"
+if [[ $EXECUTOR_TYPE = "CeleryExecutor" ]]; then
+  wait_for_port "Mysql" "$MYSQL_HOST" "$MYSQL_PORT"
+  wait_for_port "Redis" "$REDIS_HOST" "$REDIS_PORT"
+fi
 
-wait_for_port "Redis" "$REDIS_HOST" "$REDIS_PORT"
+if [[ $EXECUTOR_TYPE = "LocalExecutor" ]]; then
+  wait_for_port "Mysql" "$MYSQL_HOST" "$MYSQL_PORT"
+fi
 
 handle_worker_term_signal() {
   echo "Worker termination signal received"
