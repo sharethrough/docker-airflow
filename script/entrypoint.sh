@@ -22,9 +22,11 @@ done
 TRY_LOOP="20"
 
 wait_for_port() {
-  echo "Attempting to connect to $(host) with port $(port)" 
   local name="$1" host="$2" port="$3"
   local j=0
+
+  echo "Attempting to connect to $host with port $port" 
+
   while ! nc -z "$host" "$port" >/dev/null 2>&1 < /dev/null; do
     j=$((j+1))
     if [ $j -ge $TRY_LOOP ]; then
@@ -35,7 +37,7 @@ wait_for_port() {
     sleep 5
   done
 
-  echo "Successfully connect to $(host) with port $(port)" 
+  echo "Successfully connect to $host with port $port" 
 }
 
 if [[ $EXECUTOR_TYPE = "CeleryExecutor" ]]; then
