@@ -34,6 +34,8 @@ wait_for_port() {
     echo "$(date) - waiting for $name... $j/$TRY_LOOP"
     sleep 5
   done
+
+  echo "Successfully connect to $(host) with port $(port)" 
 }
 
 if [[ $EXECUTOR_TYPE = "CeleryExecutor" ]]; then
