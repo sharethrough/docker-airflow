@@ -22,6 +22,7 @@ done
 TRY_LOOP="20"
 
 wait_for_port() {
+  echo "Attempting to connect to $(host) with port $(port)" 
   local name="$1" host="$2" port="$3"
   local j=0
   while ! nc -z "$host" "$port" >/dev/null 2>&1 < /dev/null; do
