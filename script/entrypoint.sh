@@ -37,7 +37,7 @@ wait_for_port() {
     sleep 5
   done
 
-  echo "Successfully connect to $host with port $port" 
+  echo "Successfully connected to $host with port $port" 
 }
 
 if [[ $EXECUTOR_TYPE = "CeleryExecutor" ]]; then
@@ -48,6 +48,9 @@ fi
 if [[ $EXECUTOR_TYPE = "LocalExecutor" ]]; then
   wait_for_port "Mysql" "$MYSQL_HOST" "$MYSQL_PORT"
 fi
+
+echo "All ports check successfully, exiting container"
+exit 1
 
 handle_worker_term_signal() {
   echo "Worker termination signal received"
