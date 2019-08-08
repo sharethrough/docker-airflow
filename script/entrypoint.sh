@@ -69,33 +69,35 @@ handle_worker_term_signal() {
   exit 0
 }
 
-case "$1" in
-  webserver)
-    airflow initdb
-    exec airflow "$@"
-    ;;
-  worker)
-    # To give the webserver time to run initdb.
-    sleep 10
-    trap handle_worker_term_signal SIGTERM
+airflow initdb
 
-    exec airflow worker & pid="$!"
-
-    wait $pid
-    ;;
-  scheduler)
-    sleep 10
-    exec airflow "$@"
-    ;;
-  flower)
-    sleep 10
-    exec airflow "$@"
-    ;;
-  version)
-    exec airflow "$@"
-    ;;
-  *)
-    # The command is something like bash, not an airflow subcommand. Just run it in the right environment.
-    exec "$@"
-    ;;
-esac
+#case "$1" in
+#  webserver)
+#    airflow initdb
+#    exec airflow "$@"
+#    ;;
+#  worker)
+#    # To give the webserver time to run initdb.
+#    sleep 10
+#    trap handle_worker_term_signal SIGTERM
+#
+#    exec airflow worker & pid="$!"
+#
+#    wait $pid
+#    ;;
+#  scheduler)
+#    sleep 10
+#    exec airflow "$@"
+#    ;;
+#  flower)
+#    sleep 10
+#    exec airflow "$@"
+#    ;;
+#  version)
+#    exec airflow "$@"
+#    ;;
+#  *)
+#    # The command is something like bash, not an airflow subcommand. Just run it in the right environment.
+#    exec "$@"
+#    ;;
+#esac
