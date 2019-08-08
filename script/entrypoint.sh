@@ -49,8 +49,7 @@ if [[ $EXECUTOR_TYPE = "LocalExecutor" ]]; then
   wait_for_port "Mysql" "$MYSQL_HOST" "$MYSQL_PORT"
 fi
 
-echo "All ports check successfully, exiting container"
-exit 1
+echo "All ports checked successfully"
 
 handle_worker_term_signal() {
   echo "Worker termination signal received"
