@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
 
-echo "Entering entrypoint script"
+echo "Beginning entrypoint script"
 
 IP_ADDR=$(curl -s http://169.254.170.2/v2/metadata | jq -r .Containers[0].Networks[0].IPv4Addresses[0])
+LOCAL_HOSTNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)
 IP_ADDR_DASH="${IP_ADDR//./-}"
 
+export local_hostname=${LOCAL_HOSTNAME}
 export celery_worker="celery@ip-${IP_ADDR_DASH}.ec2.internal"
 export broker_url="redis://${REDIS_HOST}:${REDIS_PORT}/1"
 export queue_name="default"
+
+echo "Host IP: ${local_hostname}"
+echo "Broker url: ${broker_url}"
+echo "Celery url: ${celery_worker}"
+echo "Queue name: ${queue_name}"
 
 #Parse aws secrets
 for var in "${!AWS_SECRET_@}"; do
