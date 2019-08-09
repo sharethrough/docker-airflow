@@ -5,7 +5,7 @@ echo "Entering entrypoint script"
 IP_ADDR=$(curl -s http://169.254.170.2/v2/metadata | jq -r .Containers[0].Networks[0].IPv4Addresses[0])
 IP_ADDR_DASH="${IP_ADDR//./-}"
 
-export celery_worker="celery@ip-${IP_ADDR_DASH}.${REGION}.compute.internal"
+export celery_worker="celery@ip-${IP_ADDR_DASH}.ec2.internal"
 export broker_url="redis://${REDIS_HOST}:${REDIS_PORT}/1"
 export queue_name="default"
 
