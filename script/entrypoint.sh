@@ -64,7 +64,9 @@ handle_worker_term_signal() {
   echo "Celery url: ${celery_worker}"
   echo "Queue name: ${queue_name}"
 
+  echo "Cancelling queue consumer"
   celery -b $broker_url -d $celery_worker control cancel_consumer $queue_name
+  echo "Finished cancelling queue consumer"
 
   while (( $(celery -b $broker_url inspect active --json | python -c "import sys, json; print (len(json.load(sys.stdin)['$celery_worker']))") > 0 )); do
     echo "Sleeping..."
