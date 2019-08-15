@@ -65,7 +65,19 @@ handle_worker_term_signal() {
   echo "Queue name: ${queue_name}"
 
   echo "Cancelling queue consumer"
-  celery -b $broker_url -d $celery_worker control cancel_consumer $queue_name
+
+  local k=0
+  # Try to cancel consuming from queue
+  while ! celery -b $broker_url -d $celery_worker control cancel_consumer $queue_name; do
+    k=$((k+1))
+    if [ $k -ge $TRY_LOOP ]; then
+      echo >&2 "Queue not reachable, giving up"
+      exit 1
+    fi
+    echo "Failed to get response from celery queue, sleeping..."
+    sleep 10
+  done
+
   echo "Finished cancelling queue consumer"
 
   while (( $(celery -b $broker_url inspect active --json | python -c "import sys, json; print (len(json.load(sys.stdin)['$celery_worker']))") > 0 )); do
