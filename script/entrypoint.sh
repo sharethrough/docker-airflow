@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -x
+
 echo "Beginning entrypoint script"
 
 IP_ADDR=$(curl -s http://169.254.170.2/v2/metadata | jq -r .Containers[0].Networks[0].IPv4Addresses[0])
@@ -65,10 +67,8 @@ handle_worker_term_signal() {
   echo "Queue name: ${queue_name}"
 
   echo "Cancelling queue consumer"
-
   # Try to cancel consuming from queue
   celery -b $broker_url -d $celery_worker control cancel_consumer $queue_name
-
   echo "Finished cancelling queue consumer"
 
   while (( $(celery -b $broker_url inspect active --json | python -c "import sys, json; print (len(json.load(sys.stdin)['$celery_worker']))") > 0 )); do
