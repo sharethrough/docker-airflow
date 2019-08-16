@@ -10,7 +10,7 @@ IP_ADDR_DASH="${IP_ADDR//./-}"
 
 export local_hostname=${LOCAL_HOSTNAME}
 export celery_worker="celery@ip-${IP_ADDR_DASH}.ec2.internal"
-export broker_url="redis://${REDIS_HOST}:${REDIS_PORT}/1"
+export broker_url="redis://:redis@${REDIS_HOST}:${REDIS_PORT}/0"
 export queue_name="default"
 
 echo "Host IP: ${local_hostname}"
