@@ -80,30 +80,43 @@ handle_worker_term_signal() {
   exit 0
 }
 
+handle_general_term_signal() {
+  echo "Killing non worker process..."
+  kill $pid
+  exit 0
+}
+
 case "$1" in
   webserver)
     airflow initdb
-    exec airflow "$@"
+
+    trap handle_general_term_signal SIGTERM
+    exec airflow "$@" & pid="$!"
+    wait $pid
     ;;
   worker)
     # To give the webserver time to run initdb.
     sleep 10
     trap handle_worker_term_signal SIGTERM
-
     exec airflow worker & pid="$!"
-
     wait $pid
     ;;
   scheduler)
     sleep 10
-    exec airflow "$@"
+    trap handle_general_term_signal SIGTERM
+    exec airflow "$@" & pid="$!"
+    wait $pid
     ;;
   flower)
     sleep 10
-    exec airflow "$@"
+    trap handle_general_term_signal SIGTERM
+    exec airflow "$@" & pid="$!"
+    wait $pid
     ;;
   version)
-    exec airflow "$@"
+    trap handle_general_term_signal SIGTERM
+    exec airflow "$@" & pid="$!"
+    wait $pid
     ;;
   *)
     # The command is something like bash, not an airflow subcommand. Just run it in the right environment.
