@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -x
-
 echo "Beginning entrypoint script"
 
 IP_ADDR=$(curl -s http://169.254.170.2/v2/metadata | jq -r .Containers[0].Networks[0].IPv4Addresses[0])
