@@ -1,12 +1,13 @@
 FROM python:3.6-slim
 LABEL maintainer="Sharethrough <engineers@sharethrough.com>"
+LABEL version=1.10.4
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
 ENV TERM linux
 
 # Airflow
-ARG AIRFLOW_VERSION=1.10.3
+ARG AIRFLOW_VERSION=1.10.4
 ARG AIRFLOW_USER_HOME=/usr/local/airflow
 ARG AIRFLOW_DEPS="crypto,celery,jdbc,mysql,ssh,slack"
 ARG PYTHON_DEPS="slackclient>=1.0.0,<2.0.0 Flask==1.0.4"
@@ -53,7 +54,7 @@ RUN set -ex \
     && sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
     && locale-gen \
     && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
-    && pip install -U pip==9.0.3 setuptools wheel \
+    && pip install -U pip==19.2.1 setuptools wheel \
     && pip install pytz \
     && pip install pyOpenSSL \
     && pip install ndg-httpsclient \
