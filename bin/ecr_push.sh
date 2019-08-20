@@ -2,12 +2,13 @@
 
 REPO=airflow-base
 TARGET_IMAGE="119933218031.dkr.ecr.us-east-1.amazonaws.com/${REPO}"
-TARGET_IMAGE_LATEST="${TARGET_IMAGE}:latest"
-
 IMAGE_VERSION=$(docker inspect ${TARGET_IMAGE} | jq -r .[0].Config.Labels.version)
-echo "Image version: ${IMAGE_VERSION}"
+
+TARGET_IMAGE_LATEST="${TARGET_IMAGE}:latest"
 TARGET_IMAGE_VERSION="${TARGET_IMAGE}:${IMAGE_VERSION}"
-echo "Image name: ${TARGET_IMAGE_VERSION}"
+
+docker tag ${TARGET_IMAGE} ${TARGET_IMAGE_LATEST}
+docker tag ${TARGET_IMAGE} ${TARGET_IMAGE_VERSION}
 
 echo "Setting region"
 aws configure set default.region us-east-1
