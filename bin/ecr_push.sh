@@ -7,6 +7,7 @@ TARGET_IMAGE_LATEST="${TARGET_IMAGE}:latest"
 IMAGE_VERSION=$(docker inspect ${TARGET_IMAGE} | jq .[0].Config.Labels.version)
 echo "Image version: ${IMAGE_VERSION}"
 TARGET_IMAGE_VERSION="${TARGET_IMAGE}:${IMAGE_VERSION}"
+echo "Image name: ${TARGET_IMAGE_VERSION}"
 
 echo "Setting region"
 aws configure set default.region us-east-1
