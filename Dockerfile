@@ -1,6 +1,6 @@
 FROM python:3.6-slim
 LABEL maintainer="Sharethrough <engineers@sharethrough.com>"
-LABEL version=1.10.4
+LABEL version=test.version
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -10,7 +10,7 @@ ENV TERM linux
 ARG AIRFLOW_VERSION=1.10.4
 ARG AIRFLOW_USER_HOME=/usr/local/airflow
 ARG AIRFLOW_DEPS="crypto,celery,jdbc,mysql,ssh,slack"
-ARG PYTHON_DEPS="slackclient>=1.0.0,<2.0.0 Flask==1.0.4"
+ARG PYTHON_DEPS="slackclient>=1.0.0,<2.0.0 Flask==1.0.4 amqp=2.5.0"
 ENV AIRFLOW_HOME=${AIRFLOW_USER_HOME}
 
 # Define en_US.

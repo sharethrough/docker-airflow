@@ -23,6 +23,5 @@ echo "Authenticating with ecr"
 eval $(aws ecr get-login --no-include-email --region us-east-1)
 
 echo "Pushing built images to ecr"
-
 docker push ${TARGET_IMAGE_LATEST}
 docker push ${TARGET_IMAGE_VERSION}
