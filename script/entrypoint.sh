@@ -13,7 +13,7 @@ export local_hostname=${LOCAL_HOSTNAME}
 export celery_worker="celery@ip-${IP_ADDR_DASH}.ec2.internal"
 export broker_url="redis://${REDIS_HOST}:${REDIS_PORT}/0"
 export queue_name="default"
-export CELERY_BROKER_URL="redis://${REDIS_HOST}:${REDIS_PORT}/0"
+export CELERY_CONFIG_MODULE=airflow.config_templates.default_celery
 
 echo "Host IP: ${local_hostname}"
 echo "Broker url: ${broker_url}"
