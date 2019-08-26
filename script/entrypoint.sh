@@ -78,13 +78,15 @@ handle_worker_term_signal() {
 
         echo "Cancelling queue consumer"
         # Try to cancel consuming from queue
-        celery -b $broker_url -d $celery_worker control cancel_consumer $queue_name
-        CANCEL_CONSUMER_RESPONSE=$?
-        if [[ $? -eq 0 ]]; then
+        CANCEL_CONSUMER_MESSAGE=$(celery -b $broker_url -d $celery_worker control cancel_consumer $queue_name)
+        CANCEL_CONSUMER_RET=$?
+        if [[ $CANCEL_CONSUMER_RET -eq 0 ]]; then
                 echo "Consumer response succeeded"
         else
                 echo "Consumer response failed"
         fi
+
+        echo "Celery return message is: $CANCEL_CONSUMER_MESSAGE"
 
         while
             check_worker_queue
