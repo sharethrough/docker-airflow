@@ -13,7 +13,6 @@ export local_hostname=${LOCAL_HOSTNAME}
 export celery_worker="celery@ip-${IP_ADDR_DASH}.ec2.internal"
 export broker_url="redis://${REDIS_HOST}:${REDIS_PORT}/0"
 export queue_name="default"
-export CELERY_CONFIG_MODULE=airflow.config_templates.default_celery
 
 echo "Host IP: ${local_hostname}"
 echo "Broker url: ${broker_url}"
@@ -62,6 +61,14 @@ fi
 
 echo "All ports checked successfully"
 
+check_worker_queue() {
+        local active_tasks=$(celery -b $broker_url inspect active --json) 
+        local tasks_current_worker=$(echo $active_tasks | jq --arg celery_worker "$celery_worker" '.[$celery_worker]')
+        current_worker_task_number=$(echo $tasks_current_worker | jq '. | length')
+
+        echo "Found $current_worker_task_number active tasks"
+}
+
 handle_worker_term_signal() {
         echo "Worker termination signal received"
         echo "Broker url: ${broker_url}"
@@ -70,12 +77,15 @@ handle_worker_term_signal() {
 
         echo "Cancelling queue consumer"
         # Try to cancel consuming from queue
-        celery -b $broker_url -d $celery_worker control cancel_consumer $queue_name
-        echo "Finished cancelling queue consumer"
+        CANCEL_CONSUMER_RESPONSE=$(celery -b $broker_url -d $celery_worker control cancel_consumer $queue_name)
+        echo "Cancel consumer response: $CANCEL_CONSUMER_RESPONSE"
 
-        while (( $(celery -b $broker_url inspect active --json | python -c "import sys, json; print (len(json.load(sys.stdin)['$celery_worker']))") > 0 )); do
-                echo "Sleeping..."
-                sleep 60
+        while
+            check_worker_queue
+            (($current_worker_task_number > 0))
+        do
+            echo "Sleeping..."            
+            sleep 60
         done
 
         echo "Killing worker..."
