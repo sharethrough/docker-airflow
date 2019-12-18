@@ -19,10 +19,7 @@ echo "Broker url: ${broker_url}"
 echo "Celery url: ${celery_worker}"
 echo "Queue name: ${queue_name}"
 
-#Retrieve and parse aws secrets
-AIRFLOW_SECRET_VALUES=$( aws secretsmanager get-secret-value --region us-east-1 --secret-id production/airflow --version-stage AWSCURRENT | jq '.SecretString | fromjson' )
-SNOWFLAKE_SECRET_VALUES=$( aws secretsmanager get-secret-value --region us-east-1 --secret-id production/snowflake_users --version-stage AWSCURRENT | jq '.SecretString | fromjson' )
-
+#Parse aws secrets
 for s in $(echo $AIRFLOW_SECRET_VALUES | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" ); do
     export $s
 done
