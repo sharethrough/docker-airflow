@@ -1,6 +1,6 @@
 FROM python:3.6-slim
 LABEL maintainer="Sharethrough <engineers@sharethrough.com>"
-LABEL version=1.10.6
+LABEL version=1.10.6.1
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -61,6 +61,9 @@ RUN set -ex \
     && pip install pyasn1 \
     && pip install apache-airflow[${AIRFLOW_DEPS}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
     && pip install 'redis' \
+    && pip install yq \
+    && pip install awscli\
+    && pip install PyYAML\
     && if [ -n "${PYTHON_DEPS}" ]; then pip install ${PYTHON_DEPS}; fi \
     && apt-get purge --auto-remove -yqq $buildDeps \
     && apt-get autoremove -yqq --purge \
@@ -73,8 +76,11 @@ RUN set -ex \
         /usr/share/doc \
         /usr/share/doc-base
 
-COPY script/entrypoint.sh /entrypoint.sh
+COPY scripts/entrypoint.sh /entrypoint.sh
+COPY scripts/airflow_config_environment.py /airflow_config_environment.py
+
 COPY config/airflow.cfg ${AIRFLOW_USER_HOME}/airflow.cfg
+COPY config/pools.yml ${AIRFLOW_USER_HOME}/pools.yml
 
 ONBUILD COPY requirements.txt .
 ONBUILD COPY dags $AIRFLOW_HOME/dags

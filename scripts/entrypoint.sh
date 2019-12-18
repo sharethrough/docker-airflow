@@ -9,7 +9,6 @@ if [[ $ENVIRONMENT = "production" ]]; then
         IP_ADDR_DASH="${IP_ADDR//./-}"
 fi
 
-
 export local_hostname=${LOCAL_HOSTNAME}
 export celery_worker="celery@ip-${IP_ADDR_DASH}.ec2.internal"
 export broker_url="redis://${REDIS_HOST}:${REDIS_PORT}/0"
@@ -20,15 +19,17 @@ echo "Broker url: ${broker_url}"
 echo "Celery url: ${celery_worker}"
 echo "Queue name: ${queue_name}"
 
-#Parse aws secrets
-for var in "${!AWS_SECRET_@}"; do
-        echo "Processing ${var}"
-        ENV_NAME=$( echo ${var} | cut -d '_' -f3- )
-        ENV_VALUE=$( echo ${!var} | jq -r .SECRET_VALUE )
-        echo "Setting ${ENV_NAME}"
-        eval export $ENV_NAME=\$ENV_VALUE
+#Retrieve and parse aws secrets
+AIRFLOW_SECRET_VALUES=$( aws secretsmanager get-secret-value --region us-east-1 --secret-id production/airflow --version-stage AWSCURRENT | jq '.SecretString | fromjson' )
+SNOWFLAKE_SECRET_VALUES=$( aws secretsmanager get-secret-value --region us-east-1 --secret-id production/snowflake_users --version-stage AWSCURRENT | jq '.SecretString | fromjson' )
+
+for s in $(echo $AIRFLOW_SECRET_VALUES | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" ); do
+    export $s
 done
 
+for s in $(echo $SNOWFLAKE_SECRET_VALUES | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" ); do
+    export $s
+done
 
 TRY_LOOP="20"
 
@@ -109,6 +110,17 @@ handle_general_term_signal() {
 case "$1" in
         webserver)
                 airflow initdb
+                echo "Setting airflow connections and variables"
+                python3 -u /airflow_config_environment.py
+                
+                echo "Setting airflow pools"
+                if [ ! -f pools.yml ]; then
+                  echo "pools.yml file not found"
+                else
+                  echo "pools.yml file found, setting pools"
+                  cat pools.yml | yq . > pools.json
+                  airflow pool        --import pools.json
+                fi
 
                 trap handle_general_term_signal SIGTERM
                 exec airflow "$@" & pid="$!"

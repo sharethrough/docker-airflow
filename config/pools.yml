@@ -1,0 +1,6 @@
+snowflake_sensor_pool: 
+  description: This pool is for all snowflake sensors
+  slots: 16 
+snowflake_sql_pool:
+  description: This pool is for all snowflake sql sensors
+  slots: 48 
