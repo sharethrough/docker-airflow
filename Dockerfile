@@ -60,7 +60,7 @@ RUN set -ex \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
     && pip install apache-airflow[${AIRFLOW_DEPS}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
-    && pip install 'redis' \
+    && pip install 'redis'==3.3.11 \
     && pip install yq \
     && pip install awscli\
     && pip install PyYAML\
