@@ -104,21 +104,26 @@ handle_general_term_signal() {
         exit 0
 }
 
+# Initializes the airflow backend, as well as all configured connections,
+# variables and pools
+init_systems() {
+  airflow initdb
+  echo "Setting airflow connections and variables"
+  python3 -u /airflow_config_environment.py
+
+  echo "Setting airflow pools"
+  if [ ! -f pools.yml ]; then
+    echo "pools.yml file not found"
+  else
+    echo "pools.yml file found, setting pools"
+    cat pools.yml | yq . > pools.json
+    airflow pool        --import pools.json
+  fi
+}
+
 case "$1" in
         webserver)
-                airflow initdb
-                echo "Setting airflow connections and variables"
-                python3 -u /airflow_config_environment.py
-                
-                echo "Setting airflow pools"
-                if [ ! -f pools.yml ]; then
-                  echo "pools.yml file not found"
-                else
-                  echo "pools.yml file found, setting pools"
-                  cat pools.yml | yq . > pools.json
-                  airflow pool        --import pools.json
-                fi
-
+                init_systems
                 trap handle_general_term_signal SIGTERM
                 exec airflow "$@" & pid="$!"
                 wait $pid
@@ -137,7 +142,9 @@ case "$1" in
                 wait $pid
                 ;;
         *)
-                # The command is something like bash, not an airflow subcommand. Just run it in the right environment.
+                # The command is something like bash, not an airflow subcommand. However any command ran in
+                # the airflow image would assume the backend has been initialized
+                init_systems
                 exec "$@"
                 ;;
 esac
