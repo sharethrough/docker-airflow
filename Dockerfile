@@ -1,4 +1,4 @@
-FROM python:3.6-slim
+FROM python:3.7-slim-buster
 LABEL maintainer="Sharethrough <engineers@sharethrough.com>"
 LABEL version=1.1.0
 
