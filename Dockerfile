@@ -1,16 +1,16 @@
 FROM python:3.6-slim
 LABEL maintainer="Sharethrough <engineers@sharethrough.com>"
-LABEL version=1.10.6.2
+LABEL version=1.1.0
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
 ENV TERM linux
 
 # Airflow
-ARG AIRFLOW_VERSION=1.10.6
+ARG AIRFLOW_VERSION=1.10.9
 ARG AIRFLOW_USER_HOME=/usr/local/airflow
 ARG AIRFLOW_DEPS="crypto,celery,jdbc,mysql,ssh,slack"
-ARG PYTHON_DEPS="slackclient>=1.0.0,<2.0.0 kombu==4.6.3 marshmallow==2.18.0"
+ARG PYTHON_DEPS=""
 ENV AIRFLOW_HOME=${AIRFLOW_USER_HOME}
 
 # Define en_US.
@@ -60,7 +60,7 @@ RUN set -ex \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
     && pip install apache-airflow[${AIRFLOW_DEPS}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
-    && pip install 'redis==3.3.11' \
+    && pip install 'redis==3.2' \
     && pip install yq \
     && pip install awscli\
     && pip install PyYAML\
