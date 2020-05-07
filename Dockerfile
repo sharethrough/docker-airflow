@@ -1,6 +1,6 @@
 FROM python:3.7-slim-buster
 LABEL maintainer="Sharethrough <engineers@sharethrough.com>"
-LABEL version=1.2.0
+LABEL version=1.2.1
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -86,7 +86,7 @@ ONBUILD COPY requirements.txt .
 ONBUILD COPY dags $AIRFLOW_HOME/dags
 ONBUILD COPY plugins $AIRFLOW_HOME/plugins
 
-ONBUILD RUN pip install --no-cache-dir -r requirements.txt
+ONBUILD RUN pip install -r requirements.txt
 
 RUN chown -R ${USER}:${GROUP} ${AIRFLOW_USER_HOME}
 RUN chown -R ${USER}:${GROUP} /home
