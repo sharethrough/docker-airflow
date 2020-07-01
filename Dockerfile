@@ -1,6 +1,6 @@
 FROM python:3.7-slim-buster
 LABEL maintainer="Sharethrough <engineers@sharethrough.com>"
-LABEL version=1.2.1
+LABEL version=1.2.2
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -81,12 +81,6 @@ COPY scripts/airflow_config_environment.py /airflow_config_environment.py
 
 COPY config/airflow.cfg ${AIRFLOW_USER_HOME}/airflow.cfg
 COPY config/pools.yml ${AIRFLOW_USER_HOME}/pools.yml
-
-ONBUILD COPY requirements.txt .
-ONBUILD COPY dags $AIRFLOW_HOME/dags
-ONBUILD COPY plugins $AIRFLOW_HOME/plugins
-
-ONBUILD RUN pip install -r requirements.txt
 
 RUN chown -R ${USER}:${GROUP} ${AIRFLOW_USER_HOME}
 RUN chown -R ${USER}:${GROUP} /home
