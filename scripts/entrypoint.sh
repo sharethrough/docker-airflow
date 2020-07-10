@@ -2,7 +2,7 @@
 
 echo "Beginning entrypoint script"
 
-if [[ $ENVIRONMENT = "production" ]]; then
+if [[ $ENVIRONMENT = "production" || $ENVIRONMENT = "staging" ]]; then
         echo "Production environment, use ecs/ec2 endpoints"
         IP_ADDR=$(curl -s http://169.254.170.2/v2/metadata | jq -r .Containers[0].Networks[0].IPv4Addresses[0])
         LOCAL_HOSTNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)
