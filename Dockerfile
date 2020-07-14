@@ -1,6 +1,6 @@
 FROM python:3.7-slim-buster
 LABEL maintainer="Sharethrough <engineers@sharethrough.com>"
-LABEL version=1.2.2
+LABEL version=1.2.3
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
