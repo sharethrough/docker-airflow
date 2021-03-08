@@ -1,13 +1,13 @@
 FROM python:3.7-slim-buster
 LABEL maintainer="Sharethrough <engineers@sharethrough.com>"
-LABEL version=1.2.3
+LABEL version=1.2.4
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
 ENV TERM linux
 
 # Airflow
-ARG AIRFLOW_VERSION=1.10.10
+ARG AIRFLOW_VERSION=1.10.14
 ARG AIRFLOW_USER_HOME=/usr/local/airflow
 ARG AIRFLOW_DEPS="crypto,celery,jdbc,mysql,ssh,slack"
 ARG PYTHON_DEPS=""
@@ -54,6 +54,7 @@ RUN set -ex \
     && sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
     && locale-gen \
     && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
+    && python -m pip install --upgrade pip\
     && pip install -U pip setuptools wheel \
     && pip install pytz \
     && pip install pyOpenSSL \
