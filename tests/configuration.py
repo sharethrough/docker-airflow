@@ -14,9 +14,8 @@ def test_configuration_file():
     try:
         conf = AirflowConfigParser()
         conf.read(AIRFLOW_CONFIG)
-        #conf._validate()
-        #conf._validate_config_dependencies()
-        #assert conf.is_validated == True
+
+        assert conf.is_validated == True
     except:
         ex = sys.exc_info()[0]
         msg = f'Read exception detected {ex}'

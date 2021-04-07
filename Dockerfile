@@ -9,8 +9,7 @@ ENV TERM linux
 # Airflow
 ARG AIRFLOW_VERSION=1.10.14
 ARG AIRFLOW_USER_HOME=/usr/local/airflow
-#ARG AIRFLOW_DEPS="crypto,celery,jdbc,mysql,ssh,slack,aws"
-ARG AIRFLOW_DEPS="all"
+ARG AIRFLOW_DEPS="crypto,celery,jdbc,mysql,ssh,slack,aws"
 ARG PYTHON_DEPS="pytest mysql-connector-python SQLAlchemy==1.3.23 Flask-SQLAlchemy==2.4.4"
 ENV AIRFLOW_HOME=${AIRFLOW_USER_HOME}
 
