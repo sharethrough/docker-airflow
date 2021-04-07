@@ -109,7 +109,7 @@ handle_general_term_signal() {
 # Initializes the airflow backend, as well as all configured connections,
 # variables and pools
 init_systems() {
-  airflow initdb
+  airflow db init
   echo "Setting airflow connections and variables"
   python3 -u /airflow_config_environment.py
 
@@ -119,7 +119,7 @@ init_systems() {
   else
     echo "pools.yml file found, setting pools"
     cat pools.yml | yq . > pools.json
-    airflow pool        --import pools.json
+    airflow pools import pools.json
   fi
 }
 

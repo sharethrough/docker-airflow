@@ -9,8 +9,9 @@ ENV TERM linux
 # Airflow
 ARG AIRFLOW_VERSION=1.10.14
 ARG AIRFLOW_USER_HOME=/usr/local/airflow
-ARG AIRFLOW_DEPS="crypto,celery,jdbc,mysql,ssh,slack"
-ARG PYTHON_DEPS=""
+#ARG AIRFLOW_DEPS="crypto,celery,jdbc,mysql,ssh,slack,aws"
+ARG AIRFLOW_DEPS="all"
+ARG PYTHON_DEPS="pytest mysql-connector-python SQLAlchemy==1.3.23 Flask-SQLAlchemy==2.4.4"
 ENV AIRFLOW_HOME=${AIRFLOW_USER_HOME}
 
 # Define en_US.
@@ -60,7 +61,7 @@ RUN set -ex \
     && pip install pyOpenSSL \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
-    && pip install apache-airflow[${AIRFLOW_DEPS}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
+    && pip install apache-airflow[${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
     && pip install 'redis==3.2' \
     && pip install yq \
     && pip install awscli\
@@ -82,6 +83,9 @@ COPY scripts/airflow_config_environment.py /airflow_config_environment.py
 
 COPY config/airflow.cfg ${AIRFLOW_USER_HOME}/airflow.cfg
 COPY config/pools.yml ${AIRFLOW_USER_HOME}/pools.yml
+
+COPY ./Makefile ${AIRFLOW_USER_HOME}/Makefile
+COPY ./tests ${AIRFLOW_USER_HOME}/tests
 
 RUN chown -R ${USER}:${GROUP} ${AIRFLOW_USER_HOME}
 RUN chown -R ${USER}:${GROUP} /home

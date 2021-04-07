@@ -3,16 +3,21 @@ language: python
 cache: pip
 services:
   - docker
+
 before_install:
   - docker --version
   - pip install awscli
   - export PATH=$PATH:$HOME/.local/bin
+
 script:
   - docker build -t 119933218031.dkr.ecr.us-east-1.amazonaws.com/airflow-base .
-deploy:
-  provider: script
-  script: bash bin/ecr_push.sh
-  on:
-    branch: master
-after_deploy:
-  - bash bin/ci-signalfx-event.sh
+
+jobs:
+  include:
+    - stage: Deploy
+      if: branch = master AND type != pull_request
+      before_script:
+        - export AWS_REGION=us-east-1
+      script: make push
+      after_deploy:
+        - bash bin/ci-signalfx-event.sh

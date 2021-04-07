@@ -32,8 +32,6 @@ def parse_config(path=None, tag='!ENV'):
     if path:
         with open(path) as conf_data:
             return yaml.load(conf_data, Loader=loader)
-    else:
-        raise ValueError('Path should be defined as input')
 
 
 def merge_connections_file(file_name='connections.yml'):
@@ -56,8 +54,6 @@ def merge_connections_file(file_name='connections.yml'):
                     password = conn_json.get('password'),
                     port = conn_json.get('port'),
                     extra = conn_json.get('extra')))
-    else:
-        raise IOError('Path to connections file needs to exist')
 
 def set_variables(file_name='variables.yml'):
     airflow_home = os.environ['AIRFLOW_HOME']
@@ -71,8 +67,6 @@ def set_variables(file_name='variables.yml'):
             var_json = json.loads(var_json_dumps)
             for key in var_json:
                 Variable.set(key, var[key])
-    else:
-        raise IOError('Path to variables file needs to exist')
 
 def delete_connections_if_exist(airflow_default_connection_ids):
     with db.create_session() as session:

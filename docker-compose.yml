@@ -1,0 +1,34 @@
+version: '3.2'
+services:
+    mysql:
+      image: 'mysql:5.6'
+      environment:
+        - MYSQL_DATABASE=airflow_metadata
+        - MYSQL_USER=local
+        - MYSQL_PASSWORD=local
+        - MYSQL_ROOT_PASSWORD=root
+      volumes:
+        - ./ops/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
+      ports:
+          - "3306:3306"
+      logging:
+          driver: none
+
+    test:
+        image: 'airflow-base'
+        container_name: airflow-base
+        command: ["make", "test-unit"]
+        environment:
+          - AIRFLOW_HOME=/usr/local/airflow
+          - APPLICATION=airflow-ecs
+          - MYSQL_HOST=mysql
+          - MYSQL_PORT=3306
+          - MYSQL_USER=local
+          - MYSQL_PASSWORD=local
+          - MYSQL_DB=airflow_metadata
+          - REDIS_HOST=redis
+          - REDIS_PORT=6379
+          - EXECUTOR_TYPE=LocalExecutor
+          - FERNET_KEY=ZK2r8mVTHCw1EFeQZv9rvYQFJuls46jgmlV51Vb7SWA=
+          - ENGINEERS_SLACK_TOKEN=ENGINEERS_SLACK_TOKEN
+
